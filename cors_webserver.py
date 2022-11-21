@@ -43,9 +43,8 @@ class RequestHandler(SimpleHTTPRequestHandler):
         self.send_header('Access-Control-Allow-Origin', '*')
         SimpleHTTPRequestHandler.end_headers(self)
     def do_GET(self):
-        if self.path.startswith('/6_6_40'):
+        if not self.path.startswith('/info'):
           self.path = self.path + '.gz'
-          print('6640:',self.path)
           try:
               # Always read in binary mode. Opening files in text mode may cause
               # newline translations, making the actual size of the content
@@ -62,10 +61,8 @@ class RequestHandler(SimpleHTTPRequestHandler):
           fs = os.fstat(f.fileno())
           raw_content_length = fs[6]
           content = f.read()
-          #content=zlib.decompress(content, 16+zlib.MAX_WBITS)
           compressed_content_length = len(content)
           f.close()
-          #self.send_header("Content-Length", max(raw_content_length, compressed_content_length))
           self.send_header("Content-Length", compressed_content_length)
           self.send_header("Last-Modified", self.date_time_string(fs.st_mtime))
           self.end_headers()
